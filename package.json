@@ -1,0 +1,82 @@
+{
+  "name": "under-the-rug",
+  "displayName": "Under The Rug",
+  "description": "An extension that de-clutters your Explorer, by hidding selected files.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Under The Rug",
+      "properties": {
+        "under-the-rug.hiddenFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Files hidden by the Under The Rug extension."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "under-the-rug.hideSelectedFiles",
+        "title": "Hide File(s)"
+      },
+      {
+        "command": "under-the-rug.unhideFile",
+        "title": "Unhide File",
+        "icon": "$(eye)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "under-the-rug.hideSelectedFiles",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "under-the-rug.unhideFile",
+          "when": "view == hiddenFilesView && viewItem == hiddenFile",
+          "group": "inline"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "hiddenFilesView",
+          "name": "Hidden Files",
+          "icon": "$(eye-closed)"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.109.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.56.1",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
