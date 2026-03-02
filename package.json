@@ -3,6 +3,7 @@
   "displayName": "Under The Rug",
   "description": "An extension that de-clutters your Explorer, by hidding selected files.",
   "version": "0.0.1",
+  "repository": "https://github.com/FallenFoil/Under-The-Rug",
   "engines": {
     "vscode": "^1.109.0"
   },
