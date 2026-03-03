@@ -41,7 +41,7 @@
       "explorer/context": [
         {
           "command": "under-the-rug.hideSelectedFiles",
-          "group": "navigation"
+          "group": "z_commands"
         }
       ],
       "view/item/context": [
