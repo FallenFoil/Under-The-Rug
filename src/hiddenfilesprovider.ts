@@ -7,7 +7,8 @@ export class HiddenFileItem extends vscode.TreeItem {
         public readonly isFolder: boolean,
         public readonly hiddenDirectly: boolean,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-        uri?: vscode.Uri
+        uri?: vscode.Uri,
+        public readonly fromFilesystem: boolean = false
     ) {
         super(label, collapsibleState);
         this.contextValue = hiddenDirectly ? 'hiddenFile' : 'hiddenFolder';
@@ -37,6 +38,33 @@ export class HiddenFilesProvider implements vscode.TreeDataProvider<HiddenFileIt
         return element;
     }
 
+    private async getFilesystemChildren(workspaceUri: vscode.Uri, relativePath: string): Promise<HiddenFileItem[]> {
+        const folderUri = vscode.Uri.joinPath(workspaceUri, relativePath);
+        let entries: [string, vscode.FileType][];
+        try {
+            entries = await vscode.workspace.fs.readDirectory(folderUri);
+        } catch {
+            return [];
+        }
+
+        const items: HiddenFileItem[] = [];
+        for (const [name, fileType] of entries) {
+            const childRelativePath = `${relativePath}/${name}`;
+            const childUri = vscode.Uri.joinPath(workspaceUri, childRelativePath);
+            const isFolder = (fileType === vscode.FileType.Directory) || !!(fileType & vscode.FileType.Directory);
+            const collapsibleState = isFolder
+                ? vscode.TreeItemCollapsibleState.Collapsed
+                : vscode.TreeItemCollapsibleState.None;
+            items.push(new HiddenFileItem(name, childRelativePath, isFolder, false, collapsibleState, childUri, true));
+        }
+
+        return items.sort((a, b) => {
+            if (a.isFolder && !b.isFolder) { return -1; }
+            if (!a.isFolder && b.isFolder) { return 1; }
+            return a.label.localeCompare(b.label);
+        });
+    }
+
     async getChildren(element?: HiddenFileItem): Promise<HiddenFileItem[]> {
         const config = vscode.workspace.getConfiguration();
         const customHiddenFiles = config.get<string[]>('under-the-rug.hiddenFiles') || [];
@@ -45,6 +73,12 @@ export class HiddenFilesProvider implements vscode.TreeDataProvider<HiddenFileIt
             return [];
         }
         const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
+
+        // If we're expanding a folder that is directly hidden or was discovered via
+        // filesystem traversal, read its real contents from disk.
+        if (element && element.isFolder && (element.hiddenDirectly || element.fromFilesystem)) {
+            return this.getFilesystemChildren(workspaceUri, element.relativePath);
+        }
 
         const currentPath = element ? element.relativePath : '';
         const childrenMap = new Map<string, { label: string, relativePath: string, isFolder: boolean, hiddenDirectly: boolean }>();

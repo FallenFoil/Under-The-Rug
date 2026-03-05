@@ -66,6 +66,38 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(unhideCommand);
+
+	const unhideFolderCommand = vscode.commands.registerCommand(
+		'under-the-rug.unhideFolder',
+		async (item: HiddenFileItem) => {
+			if (!item || !item.relativePath) {
+				return;
+			}
+
+			const config = vscode.workspace.getConfiguration();
+			const excludes = config.get<Record<string, boolean>>('files.exclude') || {};
+			const customHiddenFiles = config.get<string[]>('under-the-rug.hiddenFiles') || [];
+
+			const folderPrefix = item.relativePath + '/';
+
+			// Remove all entries that are the folder itself or reside inside it
+			const newCustomHiddenFiles = customHiddenFiles.filter(
+				p => p !== item.relativePath && !p.startsWith(folderPrefix)
+			);
+
+			const newExcludes = { ...excludes };
+			for (const key of Object.keys(newExcludes)) {
+				if (key === item.relativePath || key.startsWith(folderPrefix)) {
+					delete newExcludes[key];
+				}
+			}
+
+			await config.update('files.exclude', newExcludes, vscode.ConfigurationTarget.Workspace);
+			await config.update('under-the-rug.hiddenFiles', newCustomHiddenFiles, vscode.ConfigurationTarget.Workspace);
+		}
+	);
+
+	context.subscriptions.push(unhideFolderCommand);
 }
 
 export function deactivate() { }

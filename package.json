@@ -35,6 +35,11 @@
         "command": "under-the-rug.unhideFile",
         "title": "Unhide File",
         "icon": "$(eye)"
+      },
+      {
+        "command": "under-the-rug.unhideFolder",
+        "title": "Unhide Folder",
+        "icon": "$(eye)"
       }
     ],
     "menus": {
@@ -48,6 +53,11 @@
         {
           "command": "under-the-rug.unhideFile",
           "when": "view == hiddenFilesView && viewItem == hiddenFile",
+          "group": "inline"
+        },
+        {
+          "command": "under-the-rug.unhideFolder",
+          "when": "view == hiddenFilesView && viewItem == hiddenFolder",
           "group": "inline"
         }
       ]
