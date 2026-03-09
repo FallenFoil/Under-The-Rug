@@ -41,7 +41,3 @@ This extension relies on the following configuration:
 ## Issues and Feedback
 
 If you find any bugs or have feature requests, please report them on the [GitHub Issue Tracker](https://github.com/FallenFoil/Under-The-Rug/issues).
-
-## Release Notes
-
-See [CHANGELOG.md](CHANGELOG.md) for details on recent updates.
