@@ -38,6 +38,10 @@ This extension relies on the following configuration:
 
 * `under-the-rug.hiddenFiles`: An array of strings containing the relative paths of all currently hidden files and folders. The extension actively tracks hidden items here to populate the "Hidden Files" tree view.
 
+## Video Demo
+
+https://github.com/user-attachments/assets/89e9e83e-c160-44af-ae6b-d6289625ed73
+
 ## Issues and Feedback
 
 If you find any bugs or have feature requests, please report them on the [GitHub Issue Tracker](https://github.com/FallenFoil/Under-The-Rug/issues).
