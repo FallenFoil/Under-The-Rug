@@ -2,7 +2,7 @@
   "name": "under-the-rug",
   "displayName": "Under The Rug",
   "description": "An extension that de-clutters your Explorer, by hidding selected files.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "repository": "https://github.com/FallenFoil/Under-The-Rug",
   "engines": {
     "vscode": "^1.109.0"
@@ -40,6 +40,16 @@
         "command": "under-the-rug.unhideFolder",
         "title": "Unhide Folder",
         "icon": "$(eye)"
+      },
+      {
+        "command": "under-the-rug.disableHiding",
+        "title": "Temporarily Show Hidden Files",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "under-the-rug.enableHiding",
+        "title": "Re-hide Files",
+        "icon": "$(eye-closed)"
       }
     ],
     "menus": {
@@ -47,6 +57,18 @@
         {
           "command": "under-the-rug.hideSelectedFiles",
           "group": "z_commands"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "under-the-rug.disableHiding",
+          "when": "view == hiddenFilesView && under-the-rug.hidingEnabled",
+          "group": "navigation"
+        },
+        {
+          "command": "under-the-rug.enableHiding",
+          "when": "view == hiddenFilesView && !under-the-rug.hidingEnabled",
+          "group": "navigation"
         }
       ],
       "view/item/context": [

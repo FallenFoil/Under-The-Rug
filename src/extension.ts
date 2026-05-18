@@ -2,6 +2,9 @@ import * as vscode from 'vscode';
 import { HiddenFilesProvider, HiddenFileItem } from './hiddenfilesprovider';
 
 export function activate(context: vscode.ExtensionContext) {
+	let hidingEnabled = true;
+	vscode.commands.executeCommand('setContext', 'under-the-rug.hidingEnabled', true);
+
 	const hiddenFilesProvider = new HiddenFilesProvider();
 	vscode.window.registerTreeDataProvider('hiddenFilesView', hiddenFilesProvider);
 
@@ -26,7 +29,9 @@ export function activate(context: vscode.ExtensionContext) {
 			// Add all selected files to the exclude list and custom hidden files
 			for (const uri of urisToHide) {
 				const relativePath = vscode.workspace.asRelativePath(uri);
-				excludes[relativePath] = true;
+				if (hidingEnabled) {
+					excludes[relativePath] = true;
+				}
 				if (!customHiddenFiles.includes(relativePath)) {
 					customHiddenFiles.push(relativePath);
 				}
@@ -98,6 +103,44 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(unhideFolderCommand);
+
+	const disableHidingCommand = vscode.commands.registerCommand(
+		'under-the-rug.disableHiding',
+		async () => {
+			const config = vscode.workspace.getConfiguration();
+			const excludes = config.get<Record<string, boolean>>('files.exclude') || {};
+			const hiddenFiles = config.get<string[]>('under-the-rug.hiddenFiles') || [];
+
+			const newExcludes = { ...excludes };
+			for (const path of hiddenFiles) {
+				delete newExcludes[path];
+			}
+
+			await config.update('files.exclude', newExcludes, vscode.ConfigurationTarget.Workspace);
+			hidingEnabled = false;
+			vscode.commands.executeCommand('setContext', 'under-the-rug.hidingEnabled', false);
+		}
+	);
+
+	const enableHidingCommand = vscode.commands.registerCommand(
+		'under-the-rug.enableHiding',
+		async () => {
+			const config = vscode.workspace.getConfiguration();
+			const excludes = config.get<Record<string, boolean>>('files.exclude') || {};
+			const hiddenFiles = config.get<string[]>('under-the-rug.hiddenFiles') || [];
+
+			const newExcludes = { ...excludes };
+			for (const path of hiddenFiles) {
+				newExcludes[path] = true;
+			}
+
+			await config.update('files.exclude', newExcludes, vscode.ConfigurationTarget.Workspace);
+			hidingEnabled = true;
+			vscode.commands.executeCommand('setContext', 'under-the-rug.hidingEnabled', true);
+		}
+	);
+
+	context.subscriptions.push(disableHidingCommand, enableHidingCommand);
 }
 
 export function deactivate() { }
